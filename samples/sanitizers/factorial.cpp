@@ -1,11 +1,8 @@
 #include <iostream>
 
-int main() {
-  int num = 0;
-  do {
-    std::cout << "Enter a positive integer:\n";
-    std::cin >> num;
-  } while (num < 0);
+int main(int argc, char* argv[]) {
+
+  int num = atoi(argv[1]);
   
   int factorial; 
   for (int i = 1; i <= num; ++i) {
@@ -13,6 +10,5 @@ int main() {
   }
 
   std::cout << num << "! = " << factorial << "\n"; 
-
   //return factorial; 
 }
