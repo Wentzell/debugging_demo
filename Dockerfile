@@ -2,23 +2,10 @@ FROM wentzell/docker_base:latest
 
 RUN sudo pip install gdbgui
 
-# Debugging Samples
-ADD samples /home/docker/samples
-RUN sudo chown -R docker /home/docker/samples
-
-# Sanitizer Config
-RUN echo "export ASAN_SYMBOLIZER_PATH=\$(which llvm-symbolizer)" >> ~/.zprofile
-RUN echo "export ASAN_OPTIONS=symbolize=1 # :detect_leaks=0" >> ~/.zprofile
-
-RUN echo "export UBSAN_SYMBOLIZER_PATH=\$(which llvm-symbolizer)" >> ~/.zprofile
-RUN echo "export UBSAN_OPTIONS=symbolize=1:print_stacktrace=1:halt_on_error=1" >> ~/.zprofile
-
-RUN echo "export MSAN_SYMBOLIZER_PATH=\$(which llvm-symbolizer)" >> ~/.zprofile
-RUN echo "export MSAN_OPTIONS=symbolize=1:halt_on_error=1" >> ~/.zprofile
-
-# Setup Compiler Explorer
+# Install relevant additional packages
 RUN sudo apt-get update && \
     DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends \
+	subversion \
 	nodejs \
 	npm \
 	g++-6 \
@@ -31,6 +18,11 @@ RUN sudo apt-get update && \
     sudo apt-get autoclean -y && \
     sudo rm -rf /var/cache/apt/* /var/lib/apt/lists/*
 
+# Copy the Debugging Samples
+ADD samples /home/docker/samples
+RUN sudo chown -R docker /home/docker/samples
+
+# Setup Compiler Explorer with various gcc and clang versions
 RUN wget https://api.github.com/repos/mattgodbolt/compiler-explorer/tarball/master -O /tmp/compiler-explorer.tar.gz
 RUN tar xzf /tmp/compiler-explorer.tar.gz --one-top-level --strip-components=1 && rm /tmp/compiler-explorer.tar.gz
 RUN (cd compiler-explorer; make dist)
@@ -38,5 +30,6 @@ COPY c++.local.properties compiler-explorer/etc/config
 RUN sudo chown docker compiler-explorer/etc/config/c++.local.properties
 
 EXPOSE 5000 10240
-CMD ["/usr/bin/zsh"]
+CMD ["/usr/bin/zsh", "-l"]
 #CMD ["cd compiler_explorer; make EXTRA_ARGS='--language c++'"]
+#CMD ["gdbgui -r"]
