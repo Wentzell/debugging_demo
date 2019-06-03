@@ -29,6 +29,12 @@ RUN (cd compiler-explorer; make dist)
 COPY c++.local.properties compiler-explorer/etc/config
 RUN sudo chown docker compiler-explorer/etc/config/c++.local.properties
 
+# Build llvm 8.0 including TSAN openmp support
+ENV CC clang
+ENV CXX clang++
+RUN mkdir /home/docker/opt
+RUN /home/docker/bin/build_llvm.sh
+
 EXPOSE 5000 10240
 CMD ["/usr/bin/zsh", "-l"]
 #CMD ["cd compiler_explorer; make EXTRA_ARGS='--language c++'"]
