@@ -37,6 +37,9 @@ RUN sudo chown docker compiler-explorer/etc/config/c++.local.properties
 # Remove solarized colorscheme
 RUN echo "set background=light\ncolorscheme default" >> ~/.vimrc && rm ~/.dircolors
 
+# Enable leak detection for ASAN
+RUN echo "export ASAN_OPTIONS=symbolize=1:detect_leaks=1" >> ~/.zprofile
+
 EXPOSE 5000 10240
 CMD ["/usr/bin/zsh", "-l"]
 #CMD ["cd compiler_explorer; make EXTRA_ARGS='--language c++'"]
