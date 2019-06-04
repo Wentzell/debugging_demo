@@ -1,8 +1,7 @@
 FROM wentzell/docker_base:latest
 
-RUN sudo pip install gdbgui
-
 # Install relevant additional packages
+RUN sudo pip install gdbgui
 RUN sudo apt-get update && \
     DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends \
 	subversion \
