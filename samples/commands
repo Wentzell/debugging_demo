@@ -41,6 +41,8 @@ valgrind ./a.out 100
 
 clang++ -fsanitize=address -fno-omit-frame-pointer -g  2-IteratorInvalid.cpp
 
+./a.out 
+
 or with warnings in next generation compilers:
 
   https://godbolt.org/z/Z878Dp
@@ -50,11 +52,15 @@ or with warnings in next generation compilers:
 
 3-Memory Leak
 
-clang++ -Wall -Wextra -g 2-Leak.cpp
+clang++ -Wall -Wextra -g 3-Leak.cpp
 
 
 
 clang++ -fsanitize=address -fno-omit-frame-pointer -g 3-Leak.cpp
+
+export ASAN_OPTIONS=symbolize=1:detect_leaks=1
+
+./a.out
 
 valgrind --leak-check=full ./a.out
 
@@ -83,6 +89,7 @@ valgrind ./a.out 4
 
 clang++ -g -fsanitize=memory  -fno-omit-frame-pointer -fsanitize-memory-track-origins 4-UninitializedVariable.cpp
 
+./a.out 4 
 
 -----------------------------------------------------------------------------
 
@@ -90,6 +97,9 @@ clang++ -g -fsanitize=memory  -fno-omit-frame-pointer -fsanitize-memory-track-or
 
 clang++ -Wall -fsanitize=undefined 5-UndefinedBehaviour.cpp
 
+export UBSAN_OPTIONS=symbolize=1:print_stacktrace=1:halt_on_error=0
+
+./a.out 4 
 
 -----------------------------------------------------------------------------
 
@@ -112,6 +122,8 @@ clang++ -g file_two.cpp file_one.cpp
 clang++ -Wall -ggdb3 7-InfiniteLoop.cpp
 
 gdbgui -r -p 5000 ./a.out --gdb-args  1047
+
+./a.out &
 
 gdb ./a.out 1047
 
