@@ -123,7 +123,7 @@ gdb ./a.out 1047
 # Load the proper TSAN compatible clang install
 addenv ~/opt/llvm_branches/release_80
 
-clang++ 8-RaceCondition.cpp -fsanitize=thread -fPIE -pie -g -fopenmp
+clang++ 8-RaceCondition.cpp -fsanitize=thread -g -fopenmp
 
 OMP_NUM_THREADS=1 ./a.out
 OMP_NUM_THREADS=2 ./a.out
