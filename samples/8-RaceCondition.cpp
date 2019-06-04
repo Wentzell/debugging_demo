@@ -3,7 +3,7 @@
 #include <vector>
 
 int main(int argc, char* argv[]) {
-  std::vector<double> data(100, 1.0);
+  std::vector<double> data(10000, 1.0);
   double sum;
 
   #pragma omp parallel shared(sum, data)

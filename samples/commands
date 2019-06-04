@@ -1,0 +1,131 @@
+Installation
+------------
+
+docker pull wentzell/debugging_demo
+
+# The files that were used building this image can be found at https://github.com/wentzell/debugging_demo
+
+docker run -ti -p 5000:5000 --privileged --name DEMO -v $PWD:/home/docker/DEMO wentzell/debugging_demo
+
+-----------------------------------------------------------------------------
+
+1-Out of Bounds
+
+
+clang++ -Wall -Wextra -g 1-OutOfBounds.cpp
+
+./a.out 10
+
+./a.out 100000
+
+./a.out 100
+
+
+
+clang++ -fsanitize=address -fno-omit-frame-pointer -g 1-OutOfBounds.cpp
+
+./a.out 10
+
+./a.out 100
+
+
+clang++ -Wall -Wextra -g 1-OutOfBounds.cpp
+
+
+valgrind ./a.out 100
+
+
+-----------------------------------------------------------------------------
+
+2-Iterator Invalid
+
+clang++ -fsanitize=address -fno-omit-frame-pointer -g  2-IteratorInvalid.cpp
+
+or with warnings in next generation compilers:
+
+  https://godbolt.org/z/Z878Dp
+
+
+-----------------------------------------------------------------------------
+
+3-Memory Leak
+
+clang++ -Wall -Wextra -g 2-Leak.cpp
+
+
+
+clang++ -fsanitize=address -fno-omit-frame-pointer -g 3-Leak.cpp
+
+valgrind --leak-check=full ./a.out
+
+
+-----------------------------------------------------------------------------
+
+4-Uninitialized variables
+
+
+clang++ -g 4-UninitializedVariable.cpp
+
+./a.out 3
+
+
+// g++ no, clang++ finds it.
+
+g++ -g 4-UninitializedVariable.cpp -Wall
+clang++ -g 4-UninitializedVariable.cpp -Wall
+
+
+cppcheck 4-UninitializedVariable.cpp 
+
+
+
+valgrind ./a.out 4 
+
+clang++ -g -fsanitize=memory  -fno-omit-frame-pointer -fsanitize-memory-track-origins 4-UninitializedVariable.cpp
+
+
+-----------------------------------------------------------------------------
+
+5-Undefined behaviour
+
+clang++ -Wall -fsanitize=undefined 5-UndefinedBehaviour.cpp
+
+
+-----------------------------------------------------------------------------
+
+6-Logic error
+
+clang++ -Wall -g 6-LogicError.cpp
+
+gdbgui -r -p 5000 ./a.out
+
+// two files
+clang++ -g file_two.cpp file_one.cpp 
+
+// load the files, put breakpoint, and look.
+
+
+-----------------------------------------------------------------------------
+
+7-Infinite Loop
+
+clang++ -Wall -ggdb3 7-InfiniteLoop.cpp
+
+gdbgui -r -p 5000 ./a.out --gdb-args  1047
+
+gdb ./a.out 1047
+
+
+-----------------------------------------------------------------------------
+
+8-Race condition
+
+# Load the proper TSAN compatible clang install
+addenv ~/opt/llvm_branches/release_80
+
+clang++ 8-RaceCondition.cpp -fsanitize=thread -fPIE -pie -g -fopenmp
+
+OMP_NUM_THREADS=1 ./a.out
+OMP_NUM_THREADS=2 ./a.out
+
+-----------------------------------------------------------------------------

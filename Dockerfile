@@ -18,6 +18,12 @@ RUN sudo apt-get update && \
     sudo apt-get autoclean -y && \
     sudo rm -rf /var/cache/apt/* /var/lib/apt/lists/*
 
+# Build llvm 8.0 including TSAN openmp support
+ENV CC clang
+ENV CXX clang++
+RUN mkdir /home/docker/opt
+RUN /home/docker/bin/build_llvm.sh && rm -r llvm llvm_build
+
 # Copy the Debugging Samples
 ADD samples /home/docker/samples
 RUN sudo chown -R docker /home/docker/samples
@@ -29,11 +35,8 @@ RUN (cd compiler-explorer; make dist)
 COPY c++.local.properties compiler-explorer/etc/config
 RUN sudo chown docker compiler-explorer/etc/config/c++.local.properties
 
-# Build llvm 8.0 including TSAN openmp support
-ENV CC clang
-ENV CXX clang++
-RUN mkdir /home/docker/opt
-RUN /home/docker/bin/build_llvm.sh
+# Remove solarized colorscheme
+RUN echo "set background=light\ncolorscheme default" >> ~/.vimrc && rm ~/.dircolors
 
 EXPOSE 5000 10240
 CMD ["/usr/bin/zsh", "-l"]
