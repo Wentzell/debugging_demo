@@ -10,4 +10,3 @@ int main(int argc, char** argv) {
   std::cout << num << "! = " << factorial << "\n";
   return factorial;
 }
-
