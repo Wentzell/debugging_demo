@@ -43,6 +43,10 @@ RUN (cd compiler-explorer; make dist)
 COPY c++.local.properties compiler-explorer/etc/config
 RUN sudo chown docker compiler-explorer/etc/config/c++.local.properties
 
+# Copy the Debugging Samples
+ADD samples /home/docker/samples
+RUN sudo chown -R docker /home/docker/samples
+
 # Remove solarized colorscheme
 RUN echo "set background=light\ncolorscheme default" >> ~/.vimrc && rm ~/.dircolors
 
