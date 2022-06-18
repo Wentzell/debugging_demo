@@ -4,35 +4,30 @@ FROM wentzell/docker_base:latest
 RUN sudo pip3 install gdbgui
 RUN sudo apt-get update && \
     DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends \
-	subversion \
+	binutils-dev \
 	curl \
 	netbase \
-	g++-7 \
-	g++-8 \
+	swig \
+	subversion \
 	g++-9 \
 	g++-10 \
-	clang-6.0 \
-	clang-7 \
-	clang-8 \
-	clang-9 \
-	clang-10 \
-	clang-11 && \
-    curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash - && \
+	clang-11 \
+	clang-12 && \
+    curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash - && \
     sudo apt-get install -y --no-install-recommends nodejs && \
     sudo apt-get autoremove --purge -y && \
     sudo apt-get autoclean -y && \
     sudo rm -rf /var/cache/apt/* /var/lib/apt/lists/*
 
-# Build llvm 12.0 including TSAN openmp support
+# Build llvm including TSAN openmp support
 ENV CC clang
 ENV CXX clang++
 RUN mkdir /home/docker/opt
-RUN sed -i 's/11\.0\.0/12.0.0-rc2/' /home/docker/bin/build_llvm.sh
 RUN /home/docker/bin/build_llvm.sh && rm -r llvm*
 
 # Build and install llvm-mi
 RUN git clone https://github.com/lldb-tools/lldb-mi && cd lldb-mi && \
-    cmake -GNinja -DCMAKE_PREFIX_PATH=/home/docker/opt/llvm_12.0.0-rc2 -DCMAKE_INSTALL_PREFIX=/home/docker/opt/llvm_12.0.0-rc2 && \
+    cmake -GNinja -DCMAKE_PREFIX_PATH=/home/docker/opt/llvm_14.0.5 \
     ninja && ninja install && \
     cd ../ && rm -r lldb-mi
 
@@ -56,4 +51,4 @@ RUN echo "export ASAN_OPTIONS=symbolize=1:detect_leaks=1" >> ~/.zprofile
 EXPOSE 5000 10240
 CMD ["/usr/bin/zsh", "-l"]
 #CMD ["cd compiler_explorer; make EXTRA_ARGS='--language c++'"]
-#CMD ["gdbgui -r -g /home/docker/opt/llvm_12.0.0-rc2/bin/lldb-mi"]
+#CMD ["gdbgui -r -g /home/docker/opt/llvm_14.0.5/bin/lldb-mi"]
