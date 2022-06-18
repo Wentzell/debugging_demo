@@ -11,7 +11,7 @@ int f(int n) {
 #include <iostream>
 int main(int argc, char **argv) {
   if (argc < 2) return 0; // no arguments : do nothing
-  int n = atoi(argv[1]);  // get the first arg and make it from string -> int
+  int n = atoi(argv[1]);  // get the first arg and convert it to int
   int result = f(n);
   std::cout << result << std::endl;
 }

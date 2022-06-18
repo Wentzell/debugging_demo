@@ -1,5 +1,5 @@
-Installation
-------------
+Using the Docker image
+----------------------
 
 docker pull wentzell/debugging_demo
 
@@ -7,6 +7,14 @@ docker pull wentzell/debugging_demo
 
 docker run -ti -p 5000:5000 --privileged --name DEMO -v $PWD:/home/docker/DEMO wentzell/debugging_demo
 
+-----------------------------------------------------------------------------
+
+# Lower the restrictions to ptrace for gdb to easily attach
+
+echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope
+
+-----------------------------------------------------------------------------
+-- Examples
 -----------------------------------------------------------------------------
 
 1-Out of Bounds
@@ -39,9 +47,10 @@ valgrind ./a.out 100
 
 2-Iterator Invalid
 
+
 clang++ -fsanitize=address -fno-omit-frame-pointer -g  2-IteratorInvalid.cpp
 
-./a.out 
+./a.out
 
 or with warnings in next generation compilers:
 
@@ -81,25 +90,25 @@ g++ -g 4-UninitializedVariable.cpp -Wall
 clang++ -g 4-UninitializedVariable.cpp -Wall
 
 
-cppcheck 4-UninitializedVariable.cpp 
+cppcheck 4-UninitializedVariable.cpp
 
 
 
-valgrind ./a.out 4 
+valgrind ./a.out 4
 
-clang++ -g -fsanitize=memory  -fno-omit-frame-pointer -fsanitize-memory-track-origins 4-UninitializedVariable.cpp
+clang++ -g -fsanitize=memory -fno-omit-frame-pointer -fsanitize-memory-track-origins 4-UninitializedVariable.cpp
 
-./a.out 4 
+./a.out 4
 
 -----------------------------------------------------------------------------
 
 5-Undefined behaviour
 
-clang++ -Wall -fsanitize=undefined 5-UndefinedBehaviour.cpp
+clang++ -Wall -fsanitize=undefined,float-divide-by-zero -g 5-UndefinedBehaviour.cpp
 
 export UBSAN_OPTIONS=symbolize=1:print_stacktrace=1:halt_on_error=0
 
-./a.out 4 
+./a.out 4
 
 -----------------------------------------------------------------------------
 
@@ -119,9 +128,9 @@ clang++ -g file_two.cpp file_one.cpp
 
 7-Infinite Loop
 
-clang++ -Wall -ggdb3 7-InfiniteLoop.cpp
+clang++ -Wall -g 7-InfiniteLoop.cpp
 
-gdbgui -r -p 5000 ./a.out --gdb-args  1047
+gdbgui -r -p 5000 ./a.out --gdb-args 1047
 
 ./a.out &
 
@@ -133,7 +142,7 @@ gdb ./a.out 1047
 8-Race condition
 
 # Load the proper TSAN compatible clang install
-addenv ~/opt/llvm_branches/release_80
+addenv ~/opt/llvm_14.0.5
 
 clang++ 8-RaceCondition.cpp -fsanitize=thread -g -fopenmp
 
